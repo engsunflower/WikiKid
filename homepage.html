@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>WikiKid</title>
+    <!-- This code was added to prevent the browser from requesting the favicon.ico file -->
+    <link rel="icon" href="data:,">
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            text-align: left;
+            margin-top: 50px;
+        }
+
+        .centered-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #0a3c78;
+        }
+
+        h3 {
+            font-size: 24px;
+            color: #555;
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.5;
+            color: #242222;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .button-custom {
+            background-color: green;
+            color: white;
+            font-size: 16px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button-custom:hover {
+            background-color: darkgreen;
+        }
+
+        #translatedContent {
+            font-size: 16px;
+            color: #000000;
+            margin-top: 25px;
+            text-align: left;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="centered-content">
+
+            <h1>Welcome to WikiKid</h1>
+            <h3>Learning Beyond Limits</h3>
+            <img src="{{ url_for('static', filename='brainpic.jpg') }}" alt="Header Image" width="150">
+            <p>Instructions:</p>
+            <ol>
+                <li> Find a wikipedia article you'd like to understand better</li>
+                <li> Enter the article name into the box below and click rephrase!</li>
+                <li> It will take a few moments, but your rephrased article will appear below!</li>
+            </ol>
+
+            <form id="wikipedia-form" method="POST" action="/process">
+                <label for="article_name">Paste Wikipedia Article Title here:</label>
+                <input type="text" id="article_name" name="article_name">
+                <button type="submit" class="button-custom">Rephrase</button>
+            </form>
+
+            <img id="loading-icon" src="{{ url_for('static', filename='pendulum.gif') }}" alt="Loading..."
+                style="display: none;">
+            <p id='translatedContent'></p>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.getElementById('wikipedia-form').addEventListener('submit', function (event) {
+                        event.preventDefault();
+
+                        document.getElementById('loading-icon').style.display = 'block';
+                        document.getElementById('translatedContent').style.display = 'none';
+
+                        var article_name = document.getElementById('article_name').value;
+
+                        if (!article_name) {
+                            var translatedContentElement = document.getElementById('translatedContent');
+                            translatedContentElement.textContent = 'Error: Article name is missing javascript';
+                            document.getElementById('loading-icon').style.display = 'none';
+                            return;
+                        }
+
+                        fetch('/process', {
+                            method: 'POST',
+                            body: new FormData(this),
+                        })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
+                                return response.text();  // Fetch the response as text
+                            })
+                            .then(data => {
+                                var translatedContentElement = document.getElementById('translatedContent');
+
+                                if (translatedContentElement) {
+                                    var words = data.split(/\s+/);  // Split by any whitespace character (space, newline, tab, etc.)
+                                    var index = 0;
+
+                                    function displayNextWord() {
+                                        if (index < words.length) {
+                                            if (index === 0) {
+                                                translatedContentElement.textContent = '';  // Clear the content initially
+                                            }
+                                            translatedContentElement.textContent += words[index] + ' ';
+                                            index++;
+                                            // Use setTimeout to introduce a delay before displaying the next word
+                                            setTimeout(displayNextWord, 50); // Adjust the delay as needed
+                                        } else {
+                                            document.getElementById('loading-icon').style.display = 'none';
+                                            document.getElementById('translatedContent').style.display = 'block';
+                                        }
+                                    }
+
+                                    displayNextWord();
+                                } else {
+                                    console.error('Element with id "translated content" not found.');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                            });
+                    });
+                });
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>
