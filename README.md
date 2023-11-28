@@ -1,6 +1,6 @@
 # WikiKid
 
-**WikiKid** is a web application that simplifies Wikipedia articles to a 4th-grade comprehension level. It leverages the power of a Wikipedia package, the GPT-4 API, and a Flask-based backend, with HTML and JavaScript for the frontend.
+**WikiKid** is a web application that simplifies Wikipedia articles to a 4th-grade comprehension level. It leverages the power of Wikipedia - a python library, the GPT-4 API, and a Flask-based backend, with HTML and JavaScript for the frontend.
 
 ## Demo
 
